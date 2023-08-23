@@ -3,10 +3,11 @@ import nemo
 import nemo.collections.asr as nemo
 import pytorch_lightning as pl
 from ruamel.yaml import YAML
+from omegaconf import DictConfig
 
 trainer = pl.Trainer(devices=1, accelerator='gpu', max_epochs=50)
 
-from omegaconf import DictConfig
+
 
 config_path = './configs/config.yaml'
 yaml = YAML(typ='safe')
@@ -19,13 +20,11 @@ params['model']['validation_ds']['manifest_filepath'] = "./dataset/test_manifest
 model = nemo.models.EncDecCTCModel(cfg=DictConfig(params['model']), trainer=trainer)
 
 
-
-# Start training!!!
 trainer.fit(model)
 
 
 model.setup_test_data(test_data_config=params['model']['validation_ds'])
-# first_asr_model.cuda()
+model.cuda()
 model.eval()
 
 
